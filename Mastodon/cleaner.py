@@ -10,3 +10,4 @@ def parseHTML(html):
 def remove_html_tags(text):
     soup = BeautifulSoup(text, 'lxml')
     return soup.get_text()
+
