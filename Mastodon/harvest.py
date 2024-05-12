@@ -3,6 +3,7 @@ import sys
 import threading
 from server import *
 from request import get_timelines
+
 # from utils import write_result, get_unique_tags
 
 # validate arguments
@@ -22,12 +23,10 @@ count_dict = {}
 def fetch_timelines(server, output_file):
     token = ACCESS_TOKENS[server] if server in ACCESS_TOKENS else ""
     count = get_timelines(token, f"https://{server}", N_YEAR, output_file=output_file, local=True)
-    # with open(output_file, 'a') as f:
-    #     json.dump({server: count}, f)
 
 
 # fetch and get statuses from each server
 for server in POPULAR_SERVERS:
-    print(f"Start fetching: {server}")
+    print("Start fetching:", server)
     output_file = f"{OUTPUT_DIR}/{server.replace('.', '_')}.json"
     threading.Thread(target=fetch_timelines, args=(server, output_file)).start()

@@ -6,7 +6,6 @@ import re
 from datetime import datetime, timedelta
 from textblob import TextBlob
 import string
-# from utils import contains_any
 from cleaner import remove_html_tags
 
 
@@ -16,20 +15,25 @@ def search_params(key_list: list):
     return p
 
 
+def get_url():
+    return "https://mastodon.au"
+
+
 def get_tokens(content):
     def split_with_punc(s):
-        return [re.split(r'\W+', s) for a in s if a != '']
+        r = re.split(r'[^\w\s]]+', s)
+        return [a for a in r if a != '']
 
     # remove all emojis and UTF-8 characters
     def remove_unicode(s):
         a_en = s.encode("ascii", "ignore")
-        return a_en.encode.decode().strip().lower()
+        return a_en.decode().strip().lower()
 
     def split_with_space(s):
         return [a for a in s.split(' ') if a != '']
 
     def remove_invalid(s):
-        return re.sub(r'(?:@|http|https||#|[0-9])\S*', '', s).strip()
+        return re.sub(r'(?:@|http|https|#|[0-9])\S*', '', s).strip()
 
     def remove_punc(s):
         return ''.join(c for c in s if c not in string.punctuation)
@@ -63,12 +67,13 @@ def extract_info(status):
     return s
 
 
-def create_search_url(scope: str, key_list: list, instance_url: str, max_id: str = None, local: bool = False):
+def create_search_url(scope: str, key_list: list, max_id: str = None, local: bool = False):
+    instance_url = get_url()  # Using the get_url function to obtain the base URL
     params = scope + '?' + \
              search_params(key_list) + \
              (f'&max_id={max_id}' if max_id else '') + \
              '&limit=40' + \
-             '&local'
+             ('&local=true' if local else '')
     return f"{instance_url}/api/v1/timelines/tag/{params}"
 
 
@@ -97,18 +102,27 @@ def get_timelines_tags(access_token, scope, nyears, key_list, local: bool = Fals
     return statuses
 
 
+# def create_timelines_url(instance_url: str, max_id: str = None, local: bool = False):
+#     params = f'limit=40' + \
+#              (f'max_id={max_id}' if max_id else '') + \
+#              ('&local=true' if local else '')
+#     return f"{instance_url}/api/v1/timelines/public?{params}"
+
 def create_timelines_url(instance_url: str, max_id: str = None, local: bool = False):
-    params = f'limit=40' + \
-             (f'max_id={max_id}' if max_id else '') + \
-             ('&local=true' if local else '')
-    return f"{instance_url}/api/v1/timelines/public?{params}"
+    params = ['limit=40']
+    if max_id:
+        params.append(f'max_id={max_id}')
+    if local:
+        params.append('local=true')
+    params_string = '&'.join(params)
+    return f"{instance_url}/api/v1/timelines/public?{params_string}"
 
 
-def get_timelines(access_token, instance_url, output_file, years=1, local=False):
+def get_timelines(access_token, instance_url, nyears, output_file: str, local: bool = False):
     headers = {'Authorization': f'Bearer {access_token}'}
     with open(output_file, 'w') as f:
         f.write('')
-    date_limit = datetime.now() - timedelta(days=365 * years)
+    date_limit = datetime.now() - timedelta(days=365 * nyears)
     max_id = None
     count = 0
 
@@ -117,7 +131,7 @@ def get_timelines(access_token, instance_url, output_file, years=1, local=False)
             search_url = create_timelines_url(instance_url, max_id, local=local)
             response = requests.get(search_url, headers=headers)
         except Exception as e:
-            print(f"[Error] Requesting timelines: {str(e)}")
+            print("[Error] Requesting timelines:", str(e))
             continue
 
         sleep(1)
@@ -134,16 +148,16 @@ def get_timelines(access_token, instance_url, output_file, years=1, local=False)
                 print(f"get statuses from {data[0]['created_at']}")
                 for status in data:
                     created_at = datetime.strptime(status['created_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
-                    if created_at <= date_limit:
+                    if created_at >= date_limit:
                         s = extract_info(status)
                         if s:
                             count += 1
                             with open(output_file, 'a') as f:
                                 json.dump(s, f)
                                 f.write('\n')
-                        else:
-                            print(f"id: {status['id']} reach date limit")
-                            return count
+                    else:
+                        print(f"Skipping status id: {status['id']} as it reaches date limit.")
+                        continue  # Skip processing this status and continue with the next one
                 if data[-1]['id'] != max_id:
                     max_id = data[-1]['id']
                 else:
@@ -151,39 +165,10 @@ def get_timelines(access_token, instance_url, output_file, years=1, local=False)
                     break
 
             except Exception as e:
-                print(f"[Error] Getting status data: {str(e)}")
-                print(f"data: {json.dumps(data)}")
+                print("[Error] Getting status data:", str(e))
+                # print("data:", json.dumps(data))
                 continue
         else:
             print("No data returned")
             break
     return count
-
-# def get_url(aus_only: bool):
-#     # This function should return the URL based on whether aus_only is True or False
-#     # Since we don't know the real URLs, I'll just return a placeholder URL
-#     return "https://your.instance.url"
-#
-#
-# def extract_info(status):
-#     # Placeholder function to simulate extraction of info from status
-#     # Implement this according to your specific needs
-#     return {
-#         "id": status.get('id'),
-#         "content": status.get('content')
-#     }
-#
-#
-# def create_search_url(instance_url, max_id, local):
-#     params = f"&max_id={max_id}" if max_id else ""
-#     params += "&local=true" if local else ""
-#     return f"{instance_url}/api/v1/timelines/public?{params}"
-#
-#
-# def extract_info(status):
-#     # Placeholder function to simulate extraction of info from status
-#     # Implement this according to your specific needs
-#     return {
-#         "id": status.get('id'),
-#         "content": status.get('content')
-#     }
