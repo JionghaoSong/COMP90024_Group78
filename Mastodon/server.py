@@ -1,4 +1,5 @@
 import os
+import json
 
 # Top 9 popular servers with more registered users
 # from https://mastodonservers.net/servers/top
@@ -15,8 +16,17 @@ POPULAR_SERVERS = [
     # "c.im"
 ]
 
-# Dictionary of access tokens
+# # Dictionary of access tokens
+# ACCESS_TOKENS = {
+#     "mastodon.social": os.getenv("MASTODON_SOCIAL_TOKEN"),
+#     "mastodon.au": os.getenv("MASTODON_AU_TOKEN"),
+# }
+
+
+with open('tokens.json', 'r') as f:
+    tokens = json.load(f)
+
 ACCESS_TOKENS = {
-    "mastodon.social": os.getenv("MASTODON_SOCIAL_TOKEN"),
-    "mastodon.au": os.getenv("MASTODON_AU_TOKEN"),
+    "mastodon.social": tokens["MASTODON_SOCIAL_TOKEN"],
+    "mastodon.au": tokens["MASTODON_AU_TOKEN"],
 }
