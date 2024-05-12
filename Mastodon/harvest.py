@@ -1,9 +1,9 @@
 import json
 import sys
 import threading
-from constant.servers import *
-from helper.statuses import get_timelines, get_unique_tags
-from helper.utils import write_result, get_unique_tags
+from server import *
+from request import get_timelines
+# from utils import write_result, get_unique_tags
 
 # validate arguments
 if len(sys.argv) < 2:
@@ -13,6 +13,7 @@ if len(sys.argv) < 2:
 OUTPUT_DIR = sys.argv[1]
 N_YEAR = 1
 count_dict = {}
+
 
 # clear output file
 # with open(f"{OUTPUT_DIR}/rows.json", 'w') as f:
@@ -24,9 +25,9 @@ def fetch_timelines(server, output_file):
     # with open(output_file, 'a') as f:
     #     json.dump({server: count}, f)
 
+
 # fetch and get statuses from each server
 for server in POPULAR_SERVERS:
     print(f"Start fetching: {server}")
     output_file = f"{OUTPUT_DIR}/{server.replace('.', '_')}.json"
     threading.Thread(target=fetch_timelines, args=(server, output_file)).start()
-

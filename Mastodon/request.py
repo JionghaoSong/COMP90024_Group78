@@ -1,3 +1,4 @@
+import time
 from time import sleep
 import requests
 import json
@@ -5,14 +6,15 @@ import re
 from datetime import datetime, timedelta
 from textblob import TextBlob
 import string
+# from utils import contains_any
+from cleaner import remove_html_tags
 
-from utils import contains_any
-from htmlParser import remove_html_tags
 
 # Key list: A list of keyword to search
 def search_params(key_list: list):
     p = '&'.join(map(lambda x: f"any[]={x}", key_list))
     return p
+
 
 def get_tokens(content):
     def split_with_puncs(s):
@@ -22,7 +24,7 @@ def get_tokens(content):
         return [a for a in s.split(' ') if a != '']
 
     def remove_invalid(s):
-        return re.sub(r'(?::|;|=)(?:-)?(?:\)|\(|D|P)', '', s).strip()
+        return re.sub(r'[:;=]-?[)(DP]', '', s).strip()
 
     def remove_puncs(s):
         return ''.join(c for c in s if c not in string.punctuation)
@@ -41,7 +43,8 @@ def get_tokens(content):
     content = remove_invalid(content)
     tokens = split_with_space(content)
     tokens = concat_all(list(map(split_with_puncs, tokens)))
-    return list(set(remove_short(tokens)))
+    return list(set(remove_shorts(tokens)))
+
 
 # extract information from status
 def extract_info(status):
@@ -57,17 +60,20 @@ def extract_info(status):
         return None
     return s
 
-def create_search_url(scope: str, key_list: list, instance_url: str, max_id=None, local: bool = False, aus_only: bool = False):
+
+def create_search_url(scope: str, key_list: list, instance_url: str, max_id=None, local: bool = False,
+                      aus_only: bool = False):
     search_params = '+'.join(map(lambda x: f"any[]={x}", key_list))
     params = f"&max_id={max_id}" if max_id else ""
     params += "&local=true" if local else ""
     return f"{instance_url}/api/v1/timelines/tag/{scope}?{search_params}{params}"
 
+
 def get_timelines_tags(access_token, scope, nyears, key_list, local: bool = False, aus_only: bool = False):
     statuses = []
     instance_url = get_url(aus_only)
     headers = {'Authorization': f'Bearer {access_token}'}
-    date_limit = datetime.datetime.now() - datetime.timedelta(days=365*nyears)
+    date_limit = datetime.datetime.now() - datetime.timedelta(days=365 * nyears)
     statuses_scope = []
     max_id = None
 
@@ -88,15 +94,18 @@ def get_timelines_tags(access_token, scope, nyears, key_list, local: bool = Fals
             break
     return statuses_scope
 
+
 def create_timelines_url(instance_url: str, max_id: str = None, local: bool = False):
     params = f"&max_id={max_id}" if max_id else ""
     params += "&local=true" if local else ""
     return f"{instance_url}/api/v1/timelines/public?{params}"
 
+
 def get_url(aus_only: bool):
     # This function should return the URL based on whether aus_only is True or False
     # Since we don't know the real URLs, I'll just return a placeholder URL
     return "https://your.instance.url"
+
 
 def extract_info(status):
     # Placeholder function to simulate extraction of info from status
@@ -105,6 +114,7 @@ def extract_info(status):
         "id": status.get('id'),
         "content": status.get('content')
     }
+
 
 def get_timelines(access_token, instance_url, nyears, output_file, local=False):
     headers = {'Authorization': f'Bearer {access_token}'}
