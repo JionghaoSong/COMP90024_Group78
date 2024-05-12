@@ -16,7 +16,9 @@ def search_params(key_list: list):
 
 
 def get_url():
-    return "https://mastodon.au"
+    return "https://mastodon.social/tags/australia"
+    # return "https://mastodon.au"
+
 
 
 def get_tokens(content):
@@ -92,7 +94,7 @@ def get_timelines_tags(access_token, scope, nyears, key_list, local: bool = Fals
             print(f"get statuses from {data[0]['created_at']}")
             for status in data:
                 created_at = datetime.strptime(status['created_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
-                if created_at > date_limit:
+                if created_at > date_limit and status['language'] == 'en':
                     statuses.append(extract_info(status))
                 else:
                     break
@@ -148,7 +150,7 @@ def get_timelines(access_token, instance_url, nyears, output_file: str, local: b
                 print(f"get statuses from {data[0]['created_at']}")
                 for status in data:
                     created_at = datetime.strptime(status['created_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
-                    if created_at >= date_limit:
+                    if created_at >= date_limit and status['language'] == 'en':
                         s = extract_info(status)
                         if s:
                             count += 1
@@ -156,7 +158,6 @@ def get_timelines(access_token, instance_url, nyears, output_file: str, local: b
                                 json.dump(s, f)
                                 f.write('\n')
                     else:
-                        print(f"Skipping status id: {status['id']} as it reaches date limit.")
                         continue  # Skip processing this status and continue with the next one
                 if data[-1]['id'] != max_id:
                     max_id = data[-1]['id']
