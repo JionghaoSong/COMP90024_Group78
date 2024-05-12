@@ -29,3 +29,4 @@ for server in POPULAR_SERVERS:
     print(f"Start fetching: {server}")
     output_file = f"{OUTPUT_DIR}/{server.replace('.', '_')}.json"
     threading.Thread(target=fetch_timelines, args=(server, output_file)).start()
+
