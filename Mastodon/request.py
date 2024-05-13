@@ -138,7 +138,6 @@ def create_timelines_url(instance_url: str, max_id: str = None, local: bool = Fa
 
 
 def get_timelines(access_token, instance_url, nyears, headers, output_file: str, local: bool = False):
-    # headers = {'Authorization': f'Bearer {access_token}'}
     headers['Authorization'] = f"Bearer {access_token}"
     with open(output_file, 'w') as f:
         f.write('')
@@ -150,18 +149,22 @@ def get_timelines(access_token, instance_url, nyears, headers, output_file: str,
         try:
             search_url = create_timelines_url(instance_url, max_id, local=local)
             response = requests.get(search_url, headers=headers)
+            sleep(1)  # Throttling to avoid hitting rate limits
         except Exception as e:
             print("[Error] Requesting timelines:", str(e))
             continue
 
-        sleep(1)
+        try:
+            data = json.loads(response.text)
+        except json.decoder.JSONDecodeError:
+            print("[Warning] Failed to decode JSON:", response.text)
+            continue  # Skip this iteration and proceed with the next
 
-        data = json.loads(response.text)
         if data:
             if 'error' in data:
                 print("[Error] Requesting timelines:", data['error'])
                 if data["error"] == "Too many requests":
-                    time.sleep(10)
+                    sleep(10)
                 continue
 
             try:
@@ -185,9 +188,9 @@ def get_timelines(access_token, instance_url, nyears, headers, output_file: str,
 
             except Exception as e:
                 print("[Error] Getting status data:", str(e))
-                # print("data:", json.dumps(data))
                 continue
         else:
             print("No data returned")
             break
     return count
+
