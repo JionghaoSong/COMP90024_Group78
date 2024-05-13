@@ -1,5 +1,7 @@
 import time
 from time import sleep
+import aiohttp
+import asyncio
 import requests
 import json
 import re
@@ -15,10 +17,25 @@ def search_params(key_list: list):
     return p
 
 
-def get_url():
-    return "https://mastodon.social/tags/australia"
-    # return "https://mastodon.au"
+# def get_url():
+#     return "https://mastodon.social/tags/australia"
+#     # return "https://aus.social/explore"
 
+
+async def fetch_url(session, url):
+    async with session.get(url) as response:
+        return await response.text()
+
+
+async def get_urls_concurrently():
+    urls = [
+        "https://mastodon.social/tags/australia",
+        "https://aus.social/explore"
+    ]
+    async with aiohttp.ClientSession() as session:
+        tasks = [fetch_url(session, url) for url in urls]
+        results = await asyncio.gather(*tasks)
+    return results
 
 
 def get_tokens(content):
@@ -81,7 +98,7 @@ def create_search_url(scope: str, key_list: list, max_id: str = None, local: boo
 
 def get_timelines_tags(access_token, scope, nyears, key_list, local: bool = False, aus_only: bool = False):
     statuses = []
-    instance_url = get_url(aus_only)
+    instance_url = get_urls_concurrently
     headers = {'Authorization': f'Bearer {access_token}'}
     date_limit = datetime.now() - timedelta(days=365 * nyears)
     max_id = None
@@ -120,8 +137,9 @@ def create_timelines_url(instance_url: str, max_id: str = None, local: bool = Fa
     return f"{instance_url}/api/v1/timelines/public?{params_string}"
 
 
-def get_timelines(access_token, instance_url, nyears, output_file: str, local: bool = False):
-    headers = {'Authorization': f'Bearer {access_token}'}
+def get_timelines(access_token, instance_url, nyears, headers, output_file: str, local: bool = False):
+    # headers = {'Authorization': f'Bearer {access_token}'}
+    headers['Authorization'] = f"Bearer {access_token}"
     with open(output_file, 'w') as f:
         f.write('')
     date_limit = datetime.now() - timedelta(days=365 * nyears)
