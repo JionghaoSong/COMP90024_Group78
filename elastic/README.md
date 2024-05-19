@@ -12,14 +12,16 @@ kubectl port-forward service/elasticsearch-master -n elastic 9200:9200
 
 ## Create index
 ```
-python3 create_pedeatrain.py
+python3 create_weather.py
+python3 create_pedestrain.py
 python3 create_liquor.py
 python3 create_mastodon.py
 ```
 
 ## Insert data
 ```
-python3 insert_pedeatrain.py
+python3 insert_weather.py
+python3 insert_pedestrain.py
 python3 insert_liquor.py
 python3 insert_mastodon.py
 ```
