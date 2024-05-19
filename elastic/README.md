@@ -21,3 +21,6 @@ python3 create_mastodon.py
 python3 insert_mastodon.py
 
 ```
+
+# Geo-data reference
+https://cloud.tencent.com/developer/article/1050321
