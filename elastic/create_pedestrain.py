@@ -16,7 +16,7 @@ print(client.info())
 
 
 def create_pedestrian_index():
-    pc = "pedestrian_counting"
+    pc = "ped_counting"
     index_body = {
         "settings": {
             "index": {

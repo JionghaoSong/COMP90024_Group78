@@ -25,7 +25,7 @@ def insert_ped_data(file_name, batch_size=1000):
         for row in reader:
             lat, lon = map(float, row["Location"].split(','))
             action = {
-                "_index": "sensor_data",
+                "_index": "pes_counting",
                 "_id": f'{row["LocationID"]}_{row["SensingDateTime(Hour)"]}', 
                 "_source": {
                     "Sensor_Name": row["Sensor_Name"],
