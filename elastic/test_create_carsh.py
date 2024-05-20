@@ -1,11 +1,12 @@
+import os
 import unittest
 from unittest.mock import patch, MagicMock
-from elastic.create_crash import create_accident_index
+from create_crash import create_accident_index
 
 
 class TestCreateAccidentIndex(unittest.TestCase):
 
-    @patch('your_module.Elasticsearch')
+    @patch('create_crash.Elasticsearch')
     def test_create_accident_index_success(self, mock_elasticsearch):
         # Mock the behavior of the Elasticsearch client
         mock_client = MagicMock()
