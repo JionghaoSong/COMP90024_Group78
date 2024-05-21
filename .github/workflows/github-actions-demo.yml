@@ -6,6 +6,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 Welcome to Our project "
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
       - run: echo "🐧 This project is About the COMP90024"
       - run: echo "🔎 The Teammate of my team are GaoYuan Ou. Jonghao Ou. Shiya Fu. Mingyi Li. Zhuoyang Liu"
       - name: Check out repository code
@@ -14,6 +17,10 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: Grant execute permission to test scripts
+        run: |
+          cd ./test
+          chmod +x test_aip.sh UT.sh
       - name: Run test_aip.sh
         run: |
           cd ./test
