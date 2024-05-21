@@ -6,8 +6,8 @@ import json
 import os
 from dotenv import load_dotenv
 
-# Assume the function is in a module named mastodon_data_module
-from mastodon_data_module import insert_mastodon_data
+
+from insert_mastodon import insert_mastodon_data
 
 class TestInsertMastodonData(unittest.TestCase):
 

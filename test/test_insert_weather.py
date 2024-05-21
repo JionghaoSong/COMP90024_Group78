@@ -6,8 +6,8 @@ import csv
 import os
 from dotenv import load_dotenv
 
-# Assume the function is in a module named weather_data_module
-from weather_data_module import insert_weather_station_data
+
+from insert_weather import insert_weather_station_data
 
 class TestInsertWeatherStationData(unittest.TestCase):
 

@@ -2,8 +2,8 @@ import unittest
 from unittest.mock import patch, MagicMock
 from elasticsearch import Elasticsearch
 
-# Assume the function is in a module named `elasticsearch_module`
-from elasticsearch_module import create_melbourne_mastodon_social_index
+
+from create_filter_mastodon import create_melbourne_mastodon_social_index
 
 class TestCreateMelbourneMastodonSocialIndex(unittest.TestCase):
 

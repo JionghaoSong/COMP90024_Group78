@@ -6,8 +6,8 @@ import os
 import uuid
 import csv
 
-# Assume the function is in a module named accident_data_module
-from accident_data_module import insert_accident_data
+
+from insert_crash import insert_accident_data
 
 class TestInsertAccidentData(unittest.TestCase):
     

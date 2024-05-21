@@ -7,8 +7,8 @@ import os
 from dotenv import load_dotenv
 import uuid
 
-# Assume the function is in a module named ped_data_module
-from ped_data_module import insert_ped_data
+
+from insert_pedestrain import insert_ped_data
 
 class TestInsertPedData(unittest.TestCase):
 

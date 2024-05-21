@@ -7,8 +7,7 @@ import os
 import uuid
 from dotenv import load_dotenv
 
-# Assume the function is in a module named liquor_data_module
-from liquor_data_module import insert_liquor_data
+from insert_liquor import insert_liquor_data
 
 class TestInsertLiquorData(unittest.TestCase):
     
