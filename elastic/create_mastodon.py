@@ -45,6 +45,22 @@ def create_mastodon_social_index():
         print("Index creation failed:", response)
     return response
 
+    # try:
+    #         if client.indices.exists(index=mastodon_social):
+    #             client.indices.delete(index=mastodon_social)
+    #             print(f"Deleted existing index '{mastodon_social}'.")
+
+    #         response = client.indices.create(index=mastodon_social, body=index_body)
+    #         if 'acknowledged' in response and response['acknowledged']:
+    #             print("Index creation acknowledged.")
+    #         else:
+    #             print("Index creation failed:", response)
+
+    #         return response
+    #     except Exception as e:
+    #         print(f"An error occurred: {e}")
+    #         return None
+
 
 
 create_mastodon_social_index()

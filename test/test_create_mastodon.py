@@ -12,9 +12,7 @@ client = Elasticsearch(
     "https://localhost:9200",
     basic_auth=("elastic", os.getenv("ELASTIC_PSW")),
     verify_certs=False,
-    timeout=60,
-    max_retries=10,
-    retry_on_timeout=True
+    timeout=60
 )
 
 def create_mastodon_social_index():
@@ -65,9 +63,7 @@ class TestCreateMastodonSocialIndex(unittest.TestCase):
             "https://localhost:9200",
             basic_auth=("elastic", os.getenv("ELASTIC_PSW")),
             verify_certs=False,
-            timeout=60,
-            max_retries=10,
-            retry_on_timeout=True
+            timeout=60
         )
 
     @classmethod

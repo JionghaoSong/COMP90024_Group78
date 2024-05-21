@@ -45,5 +45,21 @@ def create_liquor_index():
         print("Index creation failed:", response)
     return response
 
+    # try:
+    #         if client.indices.exists(index=liquor):
+        #    client.indices.delete(index=liquor)
+        #     print(f"Deleted existing index '{liquor}'.")
+
+    #         response = client.indices.create(index=liquor, body=index_body)
+    #         if 'acknowledged' in response and response['acknowledged']:
+    #             print("Index creation acknowledged.")
+    #         else:
+    #             print("Index creation failed:", response)
+
+    #         return response
+    #     except Exception as e:
+    #         print(f"An error occurred: {e}")
+    #         return None
+
 
 create_liquor_index()
