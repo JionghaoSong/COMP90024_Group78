@@ -1,0 +1,5 @@
+/liquor-fetch
+/mastodon-fetch
+/sensor-fetch
+/weather-fetch
+/accidents-fetch
