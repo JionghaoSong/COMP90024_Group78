@@ -9,7 +9,15 @@ This folder contains the front-end of the project which is a Jupyter Notebook sh
 4. The changes of the sentiment score over a year.
 
 
+#### [World_Cloud.py](./World_Cloud.py)
+This file generates a world cloud based on the data that we have retrieved from Mastodon
 
+To run this file, install the packages below first:
+```bash
+pip install wordcloud
+pip install matplotlib
+pip install nltk
+```
 
 
 
