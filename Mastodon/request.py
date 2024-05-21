@@ -120,13 +120,6 @@ def get_timelines_tags(access_token, scope, nyears, key_list, local: bool = Fals
             break
     return statuses
 
-
-# def create_timelines_url(instance_url: str, max_id: str = None, local: bool = False):
-#     params = f'limit=40' + \
-#              (f'max_id={max_id}' if max_id else '') + \
-#              ('&local=true' if local else '')
-#     return f"{instance_url}/api/v1/timelines/public?{params}"
-
 def create_timelines_url(instance_url: str, max_id: str = None, local: bool = False):
     params = ['limit=40']
     if max_id:
