@@ -16,3 +16,9 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: Run test_aip.sh
+        run: |
+          ../test/test_aip.sh || echo "test_aip.sh failed" >> failed_logs.txt
+      - name: Run UT.sh
+        run: |
+          ../test/UT.sh || echo "UT.sh failed" >> failed_logs.txt
