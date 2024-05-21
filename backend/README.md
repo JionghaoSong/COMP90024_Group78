@@ -1,4 +1,4 @@
-```markdown
+
 # Data Fetching and Processing Project
 
 This project consists of several Python scripts and a build script to fetch, process, and analyze data from various sources using Elasticsearch.
@@ -101,10 +101,22 @@ pip3 install -r requirements.txt
 
 The following API endpoints are available for fetching data:
 
-- `/liquor-fetch`
-- `/mastodon-fetch`
-- `/sensor-fetch`
-- `/weather-fetch`
-- `/accidents-fetch`
+### GET
+- `/liquor/data`
+- `/accidents/data`
+- `/mastodon/data`
+- `/sensors/data`
+- `/weather/data`  
 
-```
+eg. `curl "http://127.0.0.1:9090/sensors/data" | jq '.'`
+> Parameters  
+- **scroll_id**: scroll_id is used to locate the documents (Can be None when first call)
+- **size**: setting the size of returned documents (default = 5000)
+
+eg. `curl "http://127.0.0.1:9090/sensors/data?size=100" | jq '.'`
+> Return  
+- **data**
+- **scroll_id**: used for next search
+
+
+

@@ -1,0 +1,25 @@
+zip -r liquor_data.zip .
+mv liquor_data.zip ../
+cd ..
+
+fission package create --sourcearchive ./liquor_data.zip\
+  --env python\
+  --name liquor-data\
+  --buildcmd './build.sh'
+
+fission fn create --name liquor-data\
+  --pkg liquor-data\
+  --env python\
+  --entrypoint "liquor.main" 
+
+
+fission route create --url /liquor/data --function liquor-data --name liquor-data --method GET --createingress
+fission function test --name liquor-data  | jq '.'
+
+
+curl "http://127.0.0.1:9090/liquor/data" | jq '.'
+
+
+fission ht delete --name liquor-data
+fission function delete --name liquor-data
+fission package delete --name liquor-data

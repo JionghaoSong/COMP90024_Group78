@@ -10,13 +10,18 @@ def main():
     )
 
     scroll_id = request.args.get('scroll_id')
+    size = request.args.get('size', default=5000, type=int)  
+
     try:
         if scroll_id is None:
             res = es.search(
-                index="melbourne_mastodon_social",
+                index="mastodon",
                 scroll='1m', 
-                size=100,  
-                body={"query": {"match_all": {}}}
+                size=size,  
+                body={
+                    "query": {"match_all": {}},
+                    "_source": ["sentiment", "created_at"]
+                }
             )
         else:
             res = es.scroll(scroll_id=scroll_id, scroll='1m')
