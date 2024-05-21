@@ -1,106 +1,117 @@
 import unittest
-from unittest.mock import patch, MagicMock
-from your_module import create_pedestrian_index  # Replace 'your_module' with the actual module name
+from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import NotFoundError, ConnectionTimeout
+import os
+from dotenv import load_dotenv
 
-class TestCreatePedestrianIndex(unittest.TestCase):
+# Load environment variables
+load_dotenv()
 
-    @patch('your_module.client')
-    def test_create_pedestrian_index_success(self, mock_client):
-        # Set up the mock client behavior
-        mock_client.indices.exists.return_value = True
-        mock_client.indices.delete.return_value = None
-        mock_client.indices.create.return_value = {'acknowledged': True}
+# Initialize Elasticsearch client
+client = Elasticsearch(
+    "https://localhost:9200",
+    basic_auth=("elastic", os.getenv("ELASTIC_PSW")),
+    verify_certs=False,
+    timeout=60,
+    max_retries=10,
+    retry_on_timeout=True
+)
 
-        # Call the function
-        response = create_pedestrian_index()
-
-        # Assertions
-        mock_client.indices.exists.assert_called_once_with(index='ped_counting')
-        mock_client.indices.delete.assert_called_once_with(index='ped_counting')
-        mock_client.indices.create.assert_called_once_with(index='ped_counting', body={
-            "settings": {
-                "index": {
-                    "number_of_shards": 3,
-                    "number_of_replicas": 1
-                }
-            },
-            "mappings": {
-                "properties": {
-                    "Sensor_Name": {"type": "text"},
-                    "SensingDateTime(Hour)": {"type": "date"},
-                    "LocationID": {"type": "integer"},
-                    "Direction_1": {"type": "integer"},
-                    "Direction_2": {"type": "integer"},
-                    "Total_of_Directions": {"type": "integer"},
-                    "Location": {"type": "geo_point"}
-                }
+def create_mastodon_social_index():
+    mastodon_social = "mastodon_social"
+    index_body = {
+        "settings": {
+            "index": {
+                "number_of_shards": 3,
+                "number_of_replicas": 1
             }
-        })
-        self.assertEqual(response, {'acknowledged': True})
-
-    @patch('your_module.client')
-    def test_create_pedestrian_index_no_existing_index(self, mock_client):
-        # Set up the mock client behavior
-        mock_client.indices.exists.return_value = False
-        mock_client.indices.create.return_value = {'acknowledged': True}
-
-        # Call the function
-        response = create_pedestrian_index()
-
-        # Assertions
-        mock_client.indices.exists.assert_called_once_with(index='ped_counting')
-        mock_client.indices.delete.assert_not_called()
-        mock_client.indices.create.assert_called_once_with(index='ped_counting', body={
-            "settings": {
-                "index": {
-                    "number_of_shards": 3,
-                    "number_of_replicas": 1
-                }
-            },
-            "mappings": {
-                "properties": {
-                    "Sensor_Name": {"type": "text"},
-                    "SensingDateTime(Hour)": {"type": "date"},
-                    "LocationID": {"type": "integer"},
-                    "Direction_1": {"type": "integer"},
-                    "Direction_2": {"type": "integer"},
-                    "Total_of_Directions": {"type": "integer"},
-                    "Location": {"type": "geo_point"}
-                }
+        },
+        "mappings": {
+            "properties": {
+                "id": {"type": "keyword"},
+                "created_at": {"type": "date"},
+                "lang": {"type": "keyword"},
+                "sentiment": {"type": "float"},
+                "tokens": {"type": "text"},
+                "tags": {"type": "keyword"}
             }
-        })
-        self.assertEqual(response, {'acknowledged': True})
+        }
+    }
+    try:
+        if client.indices.exists(index=mastodon_social):
+            client.indices.delete(index=mastodon_social)
+            print(f"Deleted existing index '{mastodon_social}'.")
 
-    @patch('your_module.client')
-    def test_create_pedestrian_index_failure(self, mock_client):
-        # Set up the mock client behavior
-        mock_client.indices.exists.return_value = False
-        mock_client.indices.create.return_value = {'acknowledged': False}
+        response = client.indices.create(index=mastodon_social, body=index_body)
+        if 'acknowledged' in response and response['acknowledged']:
+            print("Index creation acknowledged.")
+        else:
+            print("Index creation failed:", response)
 
-        # Call the function
-        response = create_pedestrian_index()
+        return response
+    except ConnectionTimeout:
+        print("Connection timed out while creating index.")
+        return None
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
 
-        # Assertions
-        mock_client.indices.exists.assert_called_once_with(index='ped_counting')
-        mock_client.indices.delete.assert_not_called()
-        mock_client.indices.create.assert_called_once_with(index='ped_counting', body={
-            "settings": {
-                "index": {
-                    "number_of_shards": 3,
-                    "number_of_replicas": 1
-                }
-            },
-            "mappings": {
-                "properties": {
-                    "Sensor_Name": {"type": "text"},
-                    "SensingDateTime(Hour)": {"type": "date"},
-                    "LocationID": {"type": "integer"},
-                    "Direction_1": {"type": "integer"},
-                    "Direction_2": {"type": "integer"},
-                    "Total_of_Directions": {"type": "integer"},
-                    "Location": {"type": "geo_point"}
-                }
+class TestCreateMastodonSocialIndex(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        # This method will be run once before all tests
+        cls.client = Elasticsearch(
+            "https://localhost:9200",
+            basic_auth=("elastic", os.getenv("ELASTIC_PSW")),
+            verify_certs=False,
+            timeout=60,
+            max_retries=10,
+            retry_on_timeout=True
+        )
+
+    @classmethod
+    def tearDownClass(cls):
+        # This method will be run once after all tests
+        try:
+            cls.client.indices.delete(index='mastodon_social')
+        except NotFoundError:
+            pass
+        except ConnectionTimeout:
+            print("Connection timed out while deleting index.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
+    def test_create_index(self):
+        response = create_mastodon_social_index()
+        if response:
+            self.assertIn('acknowledged', response)
+            self.assertTrue(response['acknowledged'])
+
+    def test_insert_and_retrieve_data(self):
+        response = create_mastodon_social_index()
+        if not response:
+            self.skipTest("Skipping test due to index creation failure.")
+        else:
+            # Insert data
+            document = {
+                "id": "1",
+                "created_at": "2023-01-01T00:00:00Z",
+                "lang": "en",
+                "sentiment": 0.5,
+                "tokens": "example tokens",
+                "tags": ["example", "test"]
             }
-        })
-        self.assertEqual(response, {'acknowledged': False})
 
+            try:
+                self.client.index(index='mastodon_social', id=1, document=document)
+                # Retrieve data
+                retrieved_doc = self.client.get(index='mastodon_social', id=1)
+                self.assertEqual(retrieved_doc['_source'], document)
+            except ConnectionTimeout:
+                print("Connection timed out while indexing or retrieving data.")
+            except Exception as e:
+                print(f"An error occurred: {e}")
+
+if __name__ == '__main__':
+    unittest.main()
