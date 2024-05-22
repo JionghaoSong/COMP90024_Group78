@@ -20,4 +20,4 @@ This project is designed to collect and process data from various Mastodon serve
 ## To collect data
 Navigate to the project directory in the command line and run the following command to start the server:
 ```bash
-   python server.py
+   python harvester.py .

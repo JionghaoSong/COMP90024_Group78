@@ -4,7 +4,6 @@ import random
 from server import *
 from request import get_timelines
 
-# 10个不同的User-Agents
 USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36",
@@ -30,8 +29,7 @@ count_dict = {}
 
 def fetch_timelines(server, output_file):
     token = ACCESS_TOKENS[server] if server in ACCESS_TOKENS else ""
-    headers = {'User-Agent': random.choice(USER_AGENTS)}  # 随机选择一个User-Agent
-    # 确保传递 headers 参数
+    headers = {'User-Agent': random.choice(USER_AGENTS)}
     count = get_timelines(token, f"https://{server}", N_YEAR, headers=headers, output_file=output_file, local=True)
 
 

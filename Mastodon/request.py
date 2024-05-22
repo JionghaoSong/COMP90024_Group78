@@ -17,11 +17,6 @@ def search_params(key_list: list):
     return p
 
 
-# def get_url():
-#     return "https://mastodon.social/tags/australia"
-#     # return "https://aus.social/explore"
-
-
 async def fetch_url(session, url):
     async with session.get(url) as response:
         return await response.text()
@@ -120,6 +115,7 @@ def get_timelines_tags(access_token, scope, nyears, key_list, local: bool = Fals
             break
     return statuses
 
+
 def create_timelines_url(instance_url: str, max_id: str = None, local: bool = False):
     params = ['limit=40']
     if max_id:
@@ -186,4 +182,3 @@ def get_timelines(access_token, instance_url, nyears, headers, output_file: str,
             print("No data returned")
             break
     return count
-
