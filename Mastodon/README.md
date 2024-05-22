@@ -1,4 +1,4 @@
-# Project Name
+# Mastodon
 
 ## Project Overview
 This project is designed to collect and process data from various Mastodon servers, specifically focusing on the aus. Social and mastodon. Social servers. It aims to provide insights into the usage patterns and trends within these communities.
