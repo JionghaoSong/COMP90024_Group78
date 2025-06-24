@@ -1,0 +1,93 @@
+@startuml
+start
+
+:Initialize Elasticsearch Client;
+note right
+  Connect using credentials from .env;
+end note
+
+partition "Create Indices" {
+    fork
+        :Check if Pedestrian Index Exists;
+        if (Exists?) then (yes)
+            :Delete Existing Pedestrian Index;
+        endif
+        :Create Pedestrian Index;
+        if (Error?) then (yes)
+            :Handle Pedestrian Index Creation Error;
+        endif
+    fork again
+        :Check if Liquor Index Exists;
+        if (Exists?) then (yes)
+            :Delete Existing Liquor Index;
+        endif
+        :Create Liquor Index;
+        if (Error?) then (yes)
+            :Handle Liquor Index Creation Error;
+        endif
+    fork again
+        :Check if Mastodon Index Exists;
+        if (Exists?) then (yes)
+            :Delete Existing Mastodon Index;
+        endif
+        :Create Mastodon Index;
+        if (Error?) then (yes)
+            :Handle Mastodon Index Creation Error;
+        endif
+    fork again
+        :Check if Crash Index Exists;
+        if (Exists?) then (yes)
+            :Delete Existing Crash Index;
+        endif
+        :Create Crash Index;
+        if (Error?) then (yes)
+            :Handle Crash Index Creation Error;
+        endif
+    fork again
+        :Check if Weather Index Exists;
+        if (Exists?) then (yes)
+            :Delete Existing Weather Index;
+        endif
+        :Create Weather Index;
+        if (Error?) then (yes)
+            :Handle Weather Index Creation Error;
+        endif
+    end fork
+}
+
+partition "Insert Data" {
+    fork
+        :Read Pedestrian Data from CSV;
+        :Insert Pedestrian Data in Batches;
+        if (Error?) then (yes)
+            :Handle Pedestrian Insert Errors;
+        endif
+    fork again
+        :Read Liquor Data from CSV;
+        :Insert Liquor Data in Batches;
+        if (Error?) then (yes)
+            :Handle Liquor Insert Errors;
+        endif
+    fork again
+        :Read Mastodon Data from JSON;
+        :Insert Mastodon Data in Batches;
+        if (Error?) then (yes)
+            :Handle Mastodon Insert Errors;
+        endif
+    fork again
+        :Read Crash Data from CSV;
+        :Insert Crash Data in Batches;
+        if (Error?) then (yes)
+            :Handle Crash Insert Errors;
+        endif
+    fork again
+        :Read Weather Data from CSV;
+        :Insert Weather Data in Batches;
+        if (Error?) then (yes)
+            :Handle Weather Insert Errors;
+        endif
+    end fork
+}
+
+stop
+@enduml
