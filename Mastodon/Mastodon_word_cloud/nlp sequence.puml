@@ -1,0 +1,19 @@
+@startuml
+start
+
+:Convert all text to lowercase;
+
+:Tokenize text using NLK's word_tokenize;
+
+:Remove stopwords using NLK's provided list;
+
+:Lemmatize remaining words using NLK's WordNetLemmatizer;
+
+:Transform text into TF-IDF vectors;\nApply TF-IDF vectorizer to both claim and evidence datasets;
+
+:Calculate cosine similarity between TF-IDF vectors of the claim and evidence;
+
+:Retrieve relevant evidences based on cosine similarity;\nInclude both positive and randomly selected negative samples for training;
+
+stop
+@enduml
